@@ -1,0 +1,125 @@
+using System.Diagnostics;
+
+namespace WinFormsApp7
+{
+    public partial class Form1 : Form
+    {
+
+        int score = 0;
+        int level = 3;
+        List<Button> buttons = new List<Button>();
+        List<Button> chosedbuttons = new List<Button>();
+        Random ran = new Random();
+
+        Color temp;
+
+        int index = 0;
+        int tries = 0;
+        int timelimit = 0;
+
+        bool flag = false;
+
+        string correctorder = string.Empty;
+        string playerorder = string.Empty;
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+
+
+        private void gametimer_Tick(object sender, EventArgs e)
+        {
+            if (flag)
+            {
+                timelimit++;
+                switch (timelimit)
+                {
+                    case 10:
+                       
+                        temp = chosedbuttons[index].BackColor;
+                        chosedbuttons[index].BackColor = Color.White;
+                        break;
+                    case 20:
+                        chosedbuttons[index].BackColor = temp;
+                        break;
+                    case 30:
+                        if (index < chosedbuttons.Count - 1)
+                        {
+                            index++;
+                            timelimit = 0;
+                        }
+                        else
+                        {
+                            flag = false;
+                        }
+                        break;
+
+                }
+            }
+            if (tries >= level)
+            {
+                if (correctorder == playerorder)
+                {
+                    tries = 0;
+                    gametimer.Stop();
+                    MessageBox.Show("well done");
+                    score++;
+                }
+                else
+                {
+                    tries = 0;
+                    gametimer.Stop();
+                    MessageBox.Show("try again");
+                }
+            }
+
+            label1.Text = "click" + level + "blocks";
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (score == 3 && level < 7)
+            {
+                level++;
+                score = 0;
+            }
+            correctorder = string.Empty;
+            playerorder = string.Empty;
+            chosedbuttons.Clear();
+            chosedbuttons = buttons.OrderBy(x => ran.Next()).Take(level).ToList();
+
+            for (int i = 0; i < chosedbuttons.Count; i++)
+            {
+                correctorder += chosedbuttons[i].Name + " ";
+            }
+
+            foreach (Button x in buttons)
+            {
+                x.BackColor = Color.White;
+            }
+            Debug.WriteLine(correctorder);
+            index = 0;
+            timelimit = 0;
+            flag = true;
+            gametimer.Start();
+        }
+
+        private void button_Click(object sender, EventArgs e)
+        {
+            if(!flag && chosedbuttons.Count > 1)
+            {
+                Button temp = sender as Button;
+                temp.BackColor = Color.Black;
+                playerorder += temp.Name + " ";
+                tries++;
+            }
+            else
+            {
+                return;
+            }
+        }
+    }
+
+}
